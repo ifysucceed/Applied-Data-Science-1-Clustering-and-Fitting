@@ -155,7 +155,14 @@ def plot_clustered_data(labels, data, xkmeans, ykmeans, centre_labels):
 
     # Plot clustered data points
     ax.scatter(data[:, 0], data[:, 1], c=labels, cmap="Set1", marker='o')
-    ax.scatter(xkmeans, ykmeans, color='black', marker='X', s=50, label='cluster centres')
+    ax.scatter(
+       xkmeans,
+       ykmeans,
+       color='black',
+       marker='X',
+       s=50,
+       label='cluster centres'
+    )
 
     # Adding legend to the top left corner of the plot
     ax.legend(loc='upper left')

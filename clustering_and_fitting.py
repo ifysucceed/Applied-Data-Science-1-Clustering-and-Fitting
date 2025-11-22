@@ -9,96 +9,196 @@ and ensure your code is PEP-8 compliant, including docstrings.
 Fitting should be done with only 1 target variable and 1 feature variable,
 likewise, clustering should be done with only 2 variables.
 """
+
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.stats as ss
 import seaborn as sns
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
+from scipy.optimize import curve_fit
 
 
 def plot_relational_plot(df):
-    fig, ax = plt.subplots()
+    """Scatter plot of alcohol vs quality."""
+    fig, ax = plt.subplots(dpi=144)
+    sns.scatterplot(data=df, x="Alcohol", y="Quality", ax=ax)
+    ax.set_title("Relational Plot: Alcohol vs Quality")
     plt.savefig('relational_plot.png')
     return
 
 
 def plot_categorical_plot(df):
-    fig, ax = plt.subplots()
+    """Bar plot of wine counts by quality rating."""
+    fig, ax = plt.subplots(dpi=144)
+    
+   # Use a color palette so each bar has a distinct color
+    sns.countplot(
+        data=df, 
+        x="Quality", 
+        hue='Quality', 
+        legend=False, 
+        ax=ax, 
+        palette="viridis"
+    )
+    
+    ax.set_title("Categorical Plot: Wine Counts by Quality")
     plt.savefig('categorical_plot.png')
-    return
-
+    return 
+    
 
 def plot_statistical_plot(df):
-    fig, ax = plt.subplots()
+    """Correlation heatmap of selected meaningful features."""
+    fig, ax = plt.subplots(dpi=144)
+
+    # Select only relevant columns
+    selected_cols = [
+        "Alcohol",
+        "Sulphates",
+        "Citric_Acid",
+        "Volatile_Acidity",
+        "Residual_Sugar",
+        "Density",
+        "Quality"
+    ]
+
+    corr = df[selected_cols].corr()
+
+    sns.heatmap(
+        corr,
+        annot=True,
+        cmap="coolwarm",
+        ax=ax,
+        vmin=-1,
+        vmax=1,
+        linewidths=0.5,
+        fmt=".2f"
+    )
+    ax.set_title("Correlation Heatmap (Selected Features)")
+    plt.tight_layout()
     plt.savefig('statistical_plot.png')
     return
 
 
 def statistical_analysis(df, col: str):
-    mean =
-    stddev =
-    skew =
-    excess_kurtosis =
+    """Compute mean, stddev, skewness, 
+    and kurtosis for a column."""
+    mean = df[col].mean()
+    stddev = df[col].std()
+    skew = ss.skew(df[col])
+    excess_kurtosis = ss.kurtosis(df[col])
     return mean, stddev, skew, excess_kurtosis
 
 
 def preprocessing(df):
-    # You should preprocess your data in this function and
-    # make use of quick features such as 'describe', 'head/tail' and 'corr'.
+    """Basic preprocessing: 
+    drop NA, check correlations.
+    """
+    print(df.describe())
+    print(df.head())
+    print(df.corr())
+    df = df.dropna()
+
+    # Ensure correct data types
+    print('\nData types:')
+    print(df.dtypes)
     return df
 
 
 def writing(moments, col):
+    """Print statistical moments in human-readable form."""
     print(f'For the attribute {col}:')
     print(f'Mean = {moments[0]:.2f}, '
           f'Standard Deviation = {moments[1]:.2f}, '
           f'Skewness = {moments[2]:.2f}, and '
           f'Excess Kurtosis = {moments[3]:.2f}.')
-    # Delete the following options as appropriate for your data.
-    # Not skewed and mesokurtic can be defined with asymmetries <-2 or >2.
-    print('The data was right/left/not skewed and platy/meso/leptokurtic.')
     return
 
 
 def perform_clustering(df, col1, col2):
+    """Perform K-means clustering on two chosen columns."""
+    data = df[[col1, col2]].values
+    scaler = StandardScaler()
+    norm = scaler.fit_transform(data)
 
-    def plot_elbow_method():
-        fig, ax = plt.subplots()
-        plt.savefig('elbow_plot.png')
-        return
+    # Elbow method
+    wcss = []
+    for n in range(2, 11):
+        kmeans = KMeans(n_clusters=n, n_init=20)
+        kmeans.fit(norm)
+        wcss.append(kmeans.inertia_)
+    fig, ax = plt.subplots(dpi=144)
+    ax.plot(range(2, 11), wcss, 'kx-')
+    ax.set_title("Elbow Method")
+    plt.savefig('elbow_plot.png')
 
-    def one_silhouette_inertia():
-        _score =
-        _inertia =
-        return _score, _inertia
+    # Silhouette score
+    best_n, best_score = None, -np.inf
+    for n in range(2, 11):
+        kmeans = KMeans(n_clusters=n, n_init=20)
+        labels = kmeans.fit_predict(norm)
+        score = silhouette_score(norm, labels)
+        if score > best_score:
+            best_n, best_score = n, score
 
-    # Gather data and scale
-
-    # Find best number of clusters
-    one_silhouette_inertia()
-    plot_elbow_method()
-
-    # Get cluster centers
+    # Final clustering
+    kmeans = KMeans(n_clusters=best_n, n_init=20)
+    labels = kmeans.fit_predict(norm)
+    cen = scaler.inverse_transform(kmeans.cluster_centers_)
+    xkmeans, ykmeans = cen[:, 0], cen[:, 1]
+    cenlabels = kmeans.predict(kmeans.cluster_centers_)
     return labels, data, xkmeans, ykmeans, cenlabels
 
 
 def plot_clustered_data(labels, data, xkmeans, ykmeans, centre_labels):
-    fig, ax = plt.subplots()
+    """Scatter plot of clustered data with determined centres shown."""
+    fig, ax = plt.subplots(dpi=144)
+
+    # Plot clustered data points
+    scatter = ax.scatter(data[:, 0], data[:, 1], c=labels, cmap="Set1", marker='o')
+    ax.scatter(xkmeans, ykmeans, color='black', marker='X', s=50, label='cluster centres')
+
+    # Adding legend to the top left corner of the plot
+    ax.legend(loc='upper left')
+
+    # Axis labels (adapt to your chosen features)
+    ax.legend(loc='upper left')
+    ax.set_xlabel('Alcohol')
+    ax.set_ylabel('Sulphates')
+    ax.set_title("Clustered Data")
+
     plt.savefig('clustering.png')
     return
-
+    
 
 def perform_fitting(df, col1, col2):
-    # Gather data and prepare for fitting
+    """Fit a linear regression line using curve_fit."""
+    x = df[col1].values
+    y = df[col2].values
 
-    # Fit model
+    def linfunc(x, a, b):
+        return a * x + b
 
-    # Predict across x
-    return data, x, y
+    p, cov = curve_fit(linfunc, x, y)
+    sigma = np.sqrt(np.diag(cov))
+    print(f"a = {p[0]:.2f} +/- {sigma[0]:.2f}")
+    print(f"b = {p[1]:.2f} +/- {sigma[1]:.2f}")
+
+    xfit = np.linspace(np.min(x), np.max(x), 100)
+    yfit = linfunc(xfit, *p)
+    return df, xfit, yfit
 
 
 def plot_fitted_data(data, x, y):
-    fig, ax = plt.subplots()
+    """Scatter plot with fitted line."""
+    fig, ax = plt.subplots(dpi=144)
+    ax.scatter(data["Alcohol"], data["Quality"], label="data")
+    ax.plot(x, y, 'r-', label="Fitted Line")
+    ax.set_title("Fitting: Alcohol vs Quality")
+    ax.legend()
     plt.savefig('fitting.png')
     return
 
@@ -106,15 +206,21 @@ def plot_fitted_data(data, x, y):
 def main():
     df = pd.read_csv('data.csv')
     df = preprocessing(df)
-    col = '<your chosen column for analysis>'
+    
+    # Example column for statistical analysis
+    col = 'Alcohol'
     plot_relational_plot(df)
     plot_statistical_plot(df)
     plot_categorical_plot(df)
     moments = statistical_analysis(df, col)
     writing(moments, col)
-    clustering_results = perform_clustering(df, '<your chosen x data>', '<your chosen y data>')
+
+    # Clustering on alcohol vs sulphates
+    clustering_results = perform_clustering(df, 'Alcohol', 'Sulphates')
     plot_clustered_data(*clustering_results)
-    fitting_results = perform_fitting(df, '<your chosen x data>', '<your chosen y data>')
+
+    # Fitting alcohol vs quality
+    fitting_results = perform_fitting(df, 'Alcohol', 'Quality')
     plot_fitted_data(*fitting_results)
     return
 

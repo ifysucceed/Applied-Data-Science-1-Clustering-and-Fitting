@@ -35,12 +35,7 @@ def plot_categorical_plot(df):
     """Bar plot of wine counts by quality rating."""
     fig, ax = plt.subplots(dpi=144)
     
-   # Distinct color for each bar
-    sns.countplot(data=df, x="Quality", hue='Quality',
-        legend=False,
-        ax=ax,
-        palette="viridis"
-    )
+    sns.countplot(data=df, x="Quality", hue='Quality', legend=False, ax=ax, palette="viridis")
     ax.set_title("Categorical Plot: Wine Counts by Quality")
     plt.savefig('categorical_plot.png')
     return 
@@ -173,6 +168,7 @@ def perform_fitting(df, col1, col2):
     x = df[col1].values
     y = df[col2].values
 
+ 
     def linfunc(x, a, b):
         return a * x + b
 
@@ -217,7 +213,6 @@ def main():
     fitting_results = perform_fitting(df, 'Alcohol', 'Quality')
     plot_fitted_data(*fitting_results)
     return
-
 
 if __name__ == '__main__':
     main()

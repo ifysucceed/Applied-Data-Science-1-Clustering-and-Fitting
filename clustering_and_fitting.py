@@ -35,16 +35,12 @@ def plot_categorical_plot(df):
     """Bar plot of wine counts by quality rating."""
     fig, ax = plt.subplots(dpi=144)
     
-   # Use a color palette so each bar has a distinct color
-    sns.countplot(
-        data=df, 
-        x="Quality", 
-        hue='Quality', 
-        legend=False, 
-        ax=ax, 
+   # Distinct color for each bar
+    sns.countplot(data=df, x="Quality", hue='Quality',
+        legend=False,
+        ax=ax,
         palette="viridis"
     )
-    
     ax.set_title("Categorical Plot: Wine Counts by Quality")
     plt.savefig('categorical_plot.png')
     return 
@@ -64,9 +60,7 @@ def plot_statistical_plot(df):
         "Density",
         "Quality"
     ]
-
     corr = df[selected_cols].corr()
-
     sns.heatmap(
         corr,
         annot=True,

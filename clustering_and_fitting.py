@@ -34,12 +34,12 @@ def plot_relational_plot(df):
 def plot_categorical_plot(df):
     """Bar plot of wine counts by quality rating."""
     fig, ax = plt.subplots(dpi=144)
-    
+
     sns.countplot(data=df, x="Quality", hue='Quality', legend=False, ax=ax, palette="viridis")
     ax.set_title("Categorical Plot: Wine Counts by Quality")
     plt.savefig('categorical_plot.png')
-    return 
-    
+    return
+
 
 def plot_statistical_plot(df):
     """Correlation heatmap of selected meaningful features."""
@@ -73,7 +73,7 @@ def plot_statistical_plot(df):
 
 
 def statistical_analysis(df, col: str):
-    """Compute mean, stddev, skewness, 
+    """Compute mean, stddev, skewness,
     and kurtosis for a column."""
     mean = df[col].mean()
     stddev = df[col].std()
@@ -83,7 +83,7 @@ def statistical_analysis(df, col: str):
 
 
 def preprocessing(df):
-    """Basic preprocessing: 
+    """Basic preprocessing:
     drop NA, check correlations.
     """
     print(df.describe())
@@ -161,14 +161,14 @@ def plot_clustered_data(labels, data, xkmeans, ykmeans, centre_labels):
 
     plt.savefig('clustering.png')
     return
-    
+
 
 def perform_fitting(df, col1, col2):
     """Fit a linear regression line using curve_fit."""
     x = df[col1].values
     y = df[col2].values
 
- 
+
     def linfunc(x, a, b):
         return a * x + b
 
@@ -196,7 +196,7 @@ def plot_fitted_data(data, x, y):
 def main():
     df = pd.read_csv('data.csv')
     df = preprocessing(df)
-    
+
     # Example column for statistical analysis
     col = 'Alcohol'
     plot_relational_plot(df)

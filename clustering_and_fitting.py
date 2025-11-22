@@ -35,7 +35,14 @@ def plot_categorical_plot(df):
     """Bar plot of wine counts by quality rating."""
     fig, ax = plt.subplots(dpi=144)
 
-    sns.countplot(data=df, x="Quality", hue='Quality', legend=False, ax=ax, palette="viridis")
+    sns.countplot(
+        data=df,
+        x="Quality",
+        hue='Quality',
+        legend=False,
+        ax=ax,
+        palette="viridis"
+    )
     ax.set_title("Categorical Plot: Wine Counts by Quality")
     plt.savefig('categorical_plot.png')
     return

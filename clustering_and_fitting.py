@@ -168,7 +168,6 @@ def perform_fitting(df, col1, col2):
     x = df[col1].values
     y = df[col2].values
 
-
     def linfunc(x, a, b):
         return a * x + b
 

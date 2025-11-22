@@ -147,7 +147,7 @@ def plot_clustered_data(labels, data, xkmeans, ykmeans, centre_labels):
     fig, ax = plt.subplots(dpi=144)
 
     # Plot clustered data points
-    scatter = ax.scatter(data[:, 0], data[:, 1], c=labels, cmap="Set1", marker='o')
+    ax.scatter(data[:, 0], data[:, 1], c=labels, cmap="Set1", marker='o')
     ax.scatter(xkmeans, ykmeans, color='black', marker='X', s=50, label='cluster centres')
 
     # Adding legend to the top left corner of the plot
@@ -213,6 +213,7 @@ def main():
     fitting_results = perform_fitting(df, 'Alcohol', 'Quality')
     plot_fitted_data(*fitting_results)
     return
+
 
 if __name__ == '__main__':
     main()

@@ -156,7 +156,7 @@ def plot_clustered_data(labels, data, xkmeans, ykmeans, centre_labels):
     # Plot clustered data points
     xz = data[:, 0]
     yz = data[:, 1]
-    scatter=ax.scatter(xz, yz, c=labels, cmap="Set1", marker='o')
+    scatter = ax.scatter(xz, yz, c=labels, cmap="Set1", marker='o')
     ax.scatter(
        xkmeans,
        ykmeans,

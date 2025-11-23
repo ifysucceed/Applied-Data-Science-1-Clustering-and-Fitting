@@ -154,7 +154,9 @@ def plot_clustered_data(labels, data, xkmeans, ykmeans, centre_labels):
     fig, ax = plt.subplots(dpi=144)
 
     # Plot clustered data points
-    ax.scatter(data[:, 0], data[:, 1], c=labels, cmap="Set1", marker='o')
+    xz = data[:, 0]
+    yz = data[:, 1]
+    scatter=ax.scatter(xz, yz, c=labels, cmap="Set1", marker='o')
     ax.scatter(
        xkmeans,
        ykmeans,
@@ -164,10 +166,12 @@ def plot_clustered_data(labels, data, xkmeans, ykmeans, centre_labels):
        label='cluster centres'
     )
 
-    # Adding legend to the top left corner of the plot
-    ax.legend(loc='upper left')
+    # Add discrete colorbar for cluster IDs
+    unique_labels = sorted(set(labels))
+    cbar = fig.colorbar(scatter, ax=ax, ticks=unique_labels)
+    cbar.set_ticklabels([f"Cluster {i}" for i in unique_labels])
 
-    # Axis labels (adapt to your chosen features)
+    # Axis labels
     ax.legend(loc='upper left')
     ax.set_xlabel('Alcohol')
     ax.set_ylabel('Sulphates')

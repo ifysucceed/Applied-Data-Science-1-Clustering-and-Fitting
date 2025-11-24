@@ -1,13 +1,9 @@
 """
-This is the template file for the clustering and fitting assignment.
-You will be expected to complete all the sections and
-make this a fully working, documented file.
-You should NOT change any function, file or variable names,
- if they are given to you here.
-Make use of the functions presented in the lectures
-and ensure your code is PEP-8 compliant, including docstrings.
-Fitting should be done with only 1 target variable and 1 feature variable,
-likewise, clustering should be done with only 2 variables.
+Clustering and Fitting Assignment
+Creator: Chukwufumnaya Favour Nonum
+Student ID: 24159030
+Description: Exploring White Wine Quality Through
+Clustering and Fitting.
 """
 
 
@@ -23,7 +19,7 @@ from scipy.optimize import curve_fit
 
 
 def plot_relational_plot(df):
-    """Scatter plot of alcohol vs quality."""
+    """Creates scatter plot of alcohol vs quality."""
     fig, ax = plt.subplots(dpi=144)
     sns.scatterplot(data=df, x="Alcohol", y="Quality", ax=ax)
     ax.set_title("Relational Plot: Alcohol vs Quality")
@@ -32,7 +28,7 @@ def plot_relational_plot(df):
 
 
 def plot_categorical_plot(df):
-    """Bar plot of wine counts by quality rating."""
+    """Creates bar plot of Wine Counts by Quality Score."""
     fig, ax = plt.subplots(dpi=144)
 
     sns.countplot(
@@ -82,8 +78,10 @@ def plot_statistical_plot(df):
 
 
 def statistical_analysis(df, col: str):
-    """Compute mean, stddev, skewness,
-    and kurtosis for a column."""
+    """
+    Compute mean, stddev, skewness,
+    and kurtosis for Alcohol column.
+    """
     mean = df[col].mean()
     stddev = df[col].std()
     skew = ss.skew(df[col])
@@ -92,8 +90,10 @@ def statistical_analysis(df, col: str):
 
 
 def preprocessing(df):
-    """Basic preprocessing:
+    """
+    Basic preprocessing:
     drop NA, check correlations.
+    -Check columns data types
     """
     print(df.describe())
     print(df.head())
@@ -107,7 +107,9 @@ def preprocessing(df):
 
 
 def writing(moments, col):
-    """Print statistical moments in human-readable form."""
+    """
+    Print statistical moments.
+    """
     print(f'For the attribute {col}:')
     print(f'Mean = {moments[0]:.2f}, '
           f'Standard Deviation = {moments[1]:.2f}, '
@@ -136,7 +138,8 @@ def perform_clustering(df, col1, col2):
         return
 
     def one_silhouette_inertia():
-        """Calculate silhouette score and
+        """
+        Calculate silhouette score and
         WCSS for n clusters (using outer scope n, norm).
         """
         kmeans_local = KMeans(n_clusters=n, n_init=20, random_state=42)
@@ -207,7 +210,8 @@ def plot_clustered_data(labels, data, xkmeans, ykmeans, centre_labels):
 
 
 def perform_fitting(df, col1, col2):
-    """Fitting a straight line between one feature = Alcohol
+    """
+    Fitting a straight line between one feature = Alcohol
     and one target variable = Quality.
     """
     x = df[col1].to_numpy()

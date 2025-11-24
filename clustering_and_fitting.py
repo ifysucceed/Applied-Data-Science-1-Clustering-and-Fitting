@@ -136,7 +136,9 @@ def perform_clustering(df, col1, col2):
         return
 
     def one_silhouette_inertia():
-        """Calculate silhouette score and WCSS for n clusters (using outer scope n, norm)."""
+        """Calculate silhouette score and
+        WCSS for n clusters (using outer scope n, norm).
+        """
         kmeans_local = KMeans(n_clusters=n, n_init=20, random_state=42)
         kmeans_local.fit(norm)
         labels_local = kmeans_local.labels_

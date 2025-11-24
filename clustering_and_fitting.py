@@ -181,7 +181,7 @@ def perform_clustering(df, col1, col2):
 
 def plot_clustered_data(labels, data, xkmeans, ykmeans, centre_labels):
     """
-    Creates a scatter plot of clustered data with centres shown as a black bold X.
+    Scatter plot of clustered data with centres shown as a black bold X.
     -Data points are colored by cluster label.
     """
     fig, ax = plt.subplots(dpi=144)
@@ -229,7 +229,7 @@ def perform_fitting(df, col1, col2):
     yfit = linfunc(xfit, a, b)
     data = np.vstack([xfit, yfit])
     return data, x, y
-    
+
 
 def plot_fitted_data(data, x, y):
     """Scatter plot of data with fitted line."""

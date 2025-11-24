@@ -173,9 +173,6 @@ def perform_clustering(df, col1, col2):
     xkmeans, ykmeans = centers[:, 0], centers[:, 1]
     cenlabels = kmeans.predict(kmeans.cluster_centers_)
 
-    # Overwrite data with inverse-transformed values so return matches template
-    data = scaler.inverse_transform(norm)
-
     return labels, data, xkmeans, ykmeans, cenlabels
 
 

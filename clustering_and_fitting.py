@@ -44,6 +44,8 @@ def plot_categorical_plot(df):
         palette="viridis"
     )
     ax.set_title("Categorical Plot: Wine Counts by Quality")
+    ax.set_xlabel("Quality")
+    ax.set_ylabel("Count")
     plt.savefig('categorical_plot.png')
     return
 
@@ -115,98 +117,129 @@ def writing(moments, col):
 
 
 def perform_clustering(df, col1, col2):
-    """Perform K-means clustering on two chosen columns."""
-    data = df[[col1, col2]].values
+    """
+    Perform K-means clustering on two chosen columns.
+    """
+
+    def plot_elbow_method():
+        """Plot elbow method using WCSS and best_n from outer scope."""
+        fig, ax = plt.subplots(dpi=144)
+        ks = range(min_k, max_k + 1)
+        ax.plot(ks, wcss, "kx-")
+        ax.scatter(best_n, wcss[best_n - min_k],
+                   marker="o", color="red", facecolors="none", s=50)
+        ax.set_xlabel("k")
+        ax.set_ylabel("WCSS")
+        ax.set_title("Elbow Method")
+        plt.tight_layout()
+        plt.savefig("elbow_plot.png")
+        return
+
+    def one_silhouette_inertia():
+        """Calculate silhouette score and WCSS for n clusters (using outer scope n, norm)."""
+        kmeans_local = KMeans(n_clusters=n, n_init=20, random_state=42)
+        kmeans_local.fit(norm)
+        labels_local = kmeans_local.labels_
+        _score = silhouette_score(norm, labels_local)
+        _inertia = kmeans_local.inertia_
+        return _score, _inertia
+
+    # Gather data and scale
+    data = df[[col1, col2]].to_numpy()
     scaler = StandardScaler()
     norm = scaler.fit_transform(data)
 
-    # Elbow method
-    wcss = []
-    for n in range(2, 11):
-        kmeans = KMeans(n_clusters=n, n_init=20)
-        kmeans.fit(norm)
-        wcss.append(kmeans.inertia_)
-    fig, ax = plt.subplots(dpi=144)
-    ax.plot(range(2, 11), wcss, 'kx-')
-    ax.set_title("Elbow Method")
-    plt.savefig('elbow_plot.png')
-
-    # Silhouette score
+    # Find best number of clusters
+    min_k, max_k = 2, 10
     best_n, best_score = None, -np.inf
-    for n in range(2, 11):
-        kmeans = KMeans(n_clusters=n, n_init=20)
-        labels = kmeans.fit_predict(norm)
-        score = silhouette_score(norm, labels)
+    wcss = []
+    for n in range(min_k, max_k + 1):
+        score, inertia = one_silhouette_inertia()
+        wcss.append(inertia)
         if score > best_score:
             best_n, best_score = n, score
+        print(f"{n} clusters silhouette score = {score:.2f}")
+    print(f"Best number of clusters = {best_n}")
 
-    # Final clustering
-    kmeans = KMeans(n_clusters=best_n, n_init=20)
-    labels = kmeans.fit_predict(norm)
-    cen = scaler.inverse_transform(kmeans.cluster_centers_)
-    xkmeans, ykmeans = cen[:, 0], cen[:, 1]
+    plot_elbow_method()
+
+    # Get cluster centers
+    kmeans = KMeans(n_clusters=best_n, n_init=20, random_state=42)
+    kmeans.fit(norm)
+    labels = kmeans.labels_
+    centers = scaler.inverse_transform(kmeans.cluster_centers_)
+    xkmeans, ykmeans = centers[:, 0], centers[:, 1]
     cenlabels = kmeans.predict(kmeans.cluster_centers_)
+
+    # Overwrite data with inverse-transformed values so return matches template
+    data = scaler.inverse_transform(norm)
+
     return labels, data, xkmeans, ykmeans, cenlabels
 
 
 def plot_clustered_data(labels, data, xkmeans, ykmeans, centre_labels):
-    """Scatter plot of clustered data with determined centres shown."""
+    """
+    Creates a scatter plot of clustered data with centres shown as a black bold X.
+    -Data points are colored by cluster label.
+    """
     fig, ax = plt.subplots(dpi=144)
 
-    # Plot clustered data points
-    xz = data[:, 0]
-    yz = data[:, 1]
-    scatter = ax.scatter(xz, yz, c=labels, cmap="Set1", marker='o')
-    ax.scatter(
-       xkmeans,
-       ykmeans,
-       color='black',
-       marker='X',
-       s=50,
-       label='cluster centres'
-    )
+    # Plot clustered data
+    scatter = ax.scatter(data[:, 0], data[:, 1],
+                         c=labels, cmap="Set1",
+                         marker="o")
+    # Plot cluster centres
+    ax.scatter(xkmeans, ykmeans,
+               color="black", marker="X", s=50,
+               label="Cluster Centres")
 
-    # Add discrete colorbar for cluster IDs
-    unique_labels = sorted(set(labels))
-    cbar = fig.colorbar(scatter, ax=ax, ticks=unique_labels)
-    cbar.set_ticklabels([f"Cluster {i}" for i in unique_labels])
+    # Add colorbar for cluster points
+    cbar = fig.colorbar(scatter, ax=ax)
+    cbar.set_ticks(np.unique(labels))
 
-    # Axis labels
-    ax.legend(loc='upper left')
-    ax.set_xlabel('Alcohol')
-    ax.set_ylabel('Sulphates')
+    ax.legend(loc="upper left")
+    ax.set_xlabel("Alcohol")
+    ax.set_ylabel("Sulphates")
     ax.set_title("Clustered Data")
 
-    plt.savefig('clustering.png')
+    plt.tight_layout()
+    plt.savefig("clustering.png")
     return
 
 
 def perform_fitting(df, col1, col2):
-    """Fit a linear regression line using curve_fit."""
-    x = df[col1].values
-    y = df[col2].values
+    """Fitting a straight line between one feature = Alcohol
+    and one target variable = Quality.
+    """
+    x = df[col1].to_numpy()
+    y = df[col2].to_numpy()
 
-    def linfunc(x, a, b):
-        return a * x + b
+    def linfunc(xvals, a, b):
+        return a * xvals + b
 
     p, cov = curve_fit(linfunc, x, y)
     sigma = np.sqrt(np.diag(cov))
-    print(f"a = {p[0]:.2f} +/- {sigma[0]:.2f}")
-    print(f"b = {p[1]:.2f} +/- {sigma[1]:.2f}")
+    a, b = p
+    print(f"a = {a:.2f} +/- {sigma[0]:.2f}")
+    print(f"b = {b:.2f} +/- {sigma[1]:.2f}")
 
     xfit = np.linspace(np.min(x), np.max(x), 100)
-    yfit = linfunc(xfit, *p)
-    return df, xfit, yfit
-
+    yfit = linfunc(xfit, a, b)
+    data = np.vstack([xfit, yfit])
+    return data, x, y
+    
 
 def plot_fitted_data(data, x, y):
-    """Scatter plot with fitted line."""
+    """Scatter plot of data with fitted line."""
     fig, ax = plt.subplots(dpi=144)
-    ax.scatter(data["Alcohol"], data["Quality"], label="data")
-    ax.plot(x, y, 'r-', label="Fitted Line")
+    ax.scatter(x, y, label="Data")
+    ax.plot(data[0], data[1], "r-", label="Fitted Line")
+    ax.set_xlabel("Feature Var = Alcohol")
+    ax.set_ylabel("Target Var = Quality")
     ax.set_title("Fitting: Alcohol vs Quality")
-    ax.legend()
-    plt.savefig('fitting.png')
+    ax.legend(loc='upper left')
+    plt.tight_layout()
+    plt.savefig("fitting.png")
     return
 
 
@@ -214,7 +247,7 @@ def main():
     df = pd.read_csv('data.csv')
     df = preprocessing(df)
 
-    # Example column for statistical analysis
+    # statistical moments column selection
     col = 'Alcohol'
     plot_relational_plot(df)
     plot_statistical_plot(df)

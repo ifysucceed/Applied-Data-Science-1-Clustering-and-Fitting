@@ -107,4 +107,4 @@ Quality predictions were made based on alcohol levels using the fitted model.
 ---
 
 ## Conclusion
-This project showed that some chemical properties, especially alcohol, have a noticeable relationship with wine quality. The clustering also revealed that wines can be grouped into distinct categories based on alcohol and sulphates, rather than being randomly distributed. While the linear model is simple, it still gives a reasonable estimate of quality and highlights the general trend in the data.
+This project showed that some chemical properties, especially alcohol, have a noticeable relationship with wine quality. The clustering also revealed that wines can be grouped into distinct categories based on alcohol and sulphates, rather than being randomly distributed. While the linear model is simple, it still gives a reasonable estimate of quality and highlights the general trend found in the data.
